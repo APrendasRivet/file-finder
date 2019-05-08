@@ -1,10 +1,10 @@
 #!/bin/bash
 
 if [ $# -lt 3 ];then
-	echo "Fail execution: params are required
-	EXAMPLE> ./fileFinder.sh startingPath FileExtention [expressions-1, expressions-2, ..., N]
+	echo "
+	usage: path fileExtention pattern
+	for more information about UNIX REGEX see: https://www.grymoire.com/Unix/Regular.html
 	" | grep . --color 
-	
 	exit -1
 fi
 
@@ -12,36 +12,31 @@ _PATH=$1
 
 _EXT=$2
 
-_REGEX="($3)"
+_REGEX=$3
 
 _LIST=""
 
-
-for param in ${@:4}; do
-	_REGEX+="|($param)"
-done
-
-echo "priting REGEX: $_REGEX"
+echo "Pattern: $_REGEX"
 
 for file in $(find $_PATH -name "*.$_EXT");do 
     echo "
     *** File is $file ***
-    "
+    " | grep . --color	
+
     cat $file | grep -i -E --color $_REGEX
 
-    c=$( cat $file | grep -i -E -c $_REGEX )
+    c=$( cat $file | grep -i -c -E $_REGEX )
     if [ $c -gt 0 ];then
     	echo "
-    		### 	match 	###
-    		"
+    	### 	match 	###
+    	" 
     	_LIST+=$( echo "$(pwd)/$file" | awk '{gsub("//", "/");gsub("/./", "/"); print $0" "}')
     fi
 done
 
 echo "
-		*** printing files that contain matches for the expressions ***
-	 "
-
-for element in $_LIST; do
-	echo "file: $element" | grep . --color
+*** files found ***
+"
+for file in $_LIST; do
+	echo "file: $file" | grep . --color
 done

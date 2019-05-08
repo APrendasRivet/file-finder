@@ -3,7 +3,7 @@
 if [ $# -lt 3 ];then
 	echo "
 	usage: path fileExtention pattern
-	for more information about UNIX REGEX see: https://www.grymoire.com/Unix/Regular.html
+	see: https://www.grymoire.com/Unix/Regular.html
 	" | grep . --color 
 	exit -1
 fi
@@ -19,18 +19,19 @@ _LIST=""
 echo "Pattern: $_REGEX"
 
 for file in $(find $_PATH -name "*.$_EXT");do 
+	file=$( echo $file | awk '{gsub("//", "/"); print $0" "}')
     echo "
     *** File is $file ***
     " | grep . --color	
 
-    cat $file | grep -i -E --color $_REGEX
+    cat $file | tr -d '\n' | grep -i -E --color $_REGEX
 
-    c=$( cat $file | grep -i -c -E $_REGEX )
+    c=$( cat $file | tr -d '\n' | grep -i -c -E $_REGEX )
     if [ $c -gt 0 ];then
     	echo "
     	### 	match 	###
     	" 
-    	_LIST+=$( echo "$(pwd)/$file" | awk '{gsub("//", "/");gsub("/./", "/"); print $0" "}')
+    	_LIST+=$file
     fi
 done
 
